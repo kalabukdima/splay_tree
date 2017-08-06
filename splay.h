@@ -58,6 +58,9 @@ class SplayTree {
         // Complexity: O(log size())
         void merge(SplayTree&& rhs);
 
+        // reverse elements in range [first, last)
+        void reverse(size_type first, size_type last);
+
         void swap(SplayTree& rhs) noexcept;
 
         iterator begin();
@@ -84,6 +87,8 @@ class SplayTree {
         void splay(Node&);
 
         Node& findNode(size_type index) const;
+
+        void reverseTree() noexcept;
 
     private:
         Node dummy_;
@@ -117,6 +122,19 @@ class SplayTree<T>::Node {
             }
         }
 
+        void push() {
+            using std::swap;
+            if (reverse_) {
+                swap(son_[0], son_[1]);
+                for (bool dir : {0, 1}) {
+                    if (son_[dir]) {
+                        son_[dir]->reverse_ ^= 1;
+                    }
+                }
+                reverse_ = false;
+            }
+        }
+
         void link(std::unique_ptr<Node>&& son, bool dir) {
             son_[dir] = std::move(son);
             if (son_[dir]) {
@@ -130,6 +148,7 @@ class SplayTree<T>::Node {
         std::array<std::unique_ptr<Node>, 2> son_;
         Node* dad_;
         typename SplayTree<T>::size_type subtree_size_ = 1;
+        bool reverse_ = false;
 };
 
 template <class T>
@@ -266,8 +285,13 @@ void SplayTree<T>::splay(Node& u) {
     while (!isRoot(u)) {
         Node& v = *u.dad_;
         if (isRoot(v)) {
+            v.push();
+            u.push();
             rotate(u);
         } else {
+            v.dad_->push();
+            v.push();
+            u.push();
             const bool u_dir = u.whichSon();
             const bool v_dir = v.whichSon();
             if (u_dir == v_dir) {
@@ -286,6 +310,7 @@ typename SplayTree<T>::Node& SplayTree<T>::findNode(size_type i) const {
     size_type cumulated = 0;
     Node* p = &root();
     while (true) {
+        p->push();
         const size_type index = cumulated + p->leftSubtreeSize();
         if (index == i) {
             return *p;
@@ -348,6 +373,37 @@ void SplayTree<T>::merge(SplayTree<T>&& rhs) {
 }
 
 template <class T>
+void SplayTree<T>::reverseTree() noexcept {
+    if (!empty()) {
+        root().reverse_ ^= true;
+    }
+}
+
+template <class T>
+void SplayTree<T>::reverse(size_type first, size_type last) {
+    if (first == 0 && last == size()) {
+        reverseTree();
+        return;
+    }
+    if (first > last) {
+        throw std::runtime_error(std::string("Invalid range: [") +
+                                 std::to_string(first) +
+                                 ", " + std::to_string(last) + ")");
+    }
+    if (last > size()) {
+        throw std::out_of_range(std::string("last index is ") +
+                                std::to_string(last) +
+                                " which is greater than size() which is " +
+                                std::to_string(size()));
+    }
+    auto right = split(last);
+    auto center = split(first);
+    center.reverseTree();
+    merge(std::move(center));
+    merge(std::move(right));
+}
+
+template <class T>
 typename SplayTree<T>::iterator SplayTree<T>::begin() {
     if (empty()) {
         return end();
@@ -394,10 +450,13 @@ SplayTree<T>::Iterator<IsConst>::operator++() {
     if (node_->dad_ == node_) {
         throw std::runtime_error("Calling operator++ for end iterator");
     }
+    node_->push();
     if (node_->son_[1]) {
         node_ = node_->son_[1].get();
+        node_->push();
         while (node_->son_[0]) {
             node_ = node_->son_[0].get();
+            node_->push();
         }
     } else {
         while (node_->whichSon()) {
@@ -412,10 +471,13 @@ template <class T>
 template <bool IsConst>
 SplayTree<T>::Iterator<IsConst>&
 SplayTree<T>::Iterator<IsConst>::operator--() {
+    node_->push();
     if (node_->son_[0]) {
         node_ = node_->son_[0].get();
+        node_->push();
         while (node_->son_[1]) {
             node_ = node_->son_[1].get();
+            node_->push();
         }
     } else {
         while (!node_->whichSon()) {
