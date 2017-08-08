@@ -67,6 +67,8 @@ class SplayTree {
         // Complexity: O(log size())
         void reverse(size_type first, size_type last);
 
+        iterator insert(const_iterator, T);
+
         void swap(SplayTree& rhs) noexcept;
 
         // Iterating doesn't change tree structure.
@@ -425,6 +427,24 @@ void SplayTree<T>::reverse(size_type first, size_type last) {
     center.reverseTree();
     merge(std::move(center));
     merge(std::move(right));
+}
+
+template <class T>
+typename SplayTree<T>::iterator SplayTree<T>::insert(const_iterator it, T e) {
+    Node* new_node = nullptr;
+    if (!it.node_->son_[0]) {
+        it.node_->link(std::make_unique<Node>(std::move(e)), 0);
+        new_node = it.node_->son_[0].get();
+    } else {
+        Node* p = it.node_->son_[0].get();
+        while (p->son_[1]) {
+            p = p->son_[1].get();
+        }
+        p->link(std::make_unique<Node>(std::move(e)), 1);
+        new_node = p->son_[1].get();
+    }
+    splay(*new_node);
+    return {new_node};
 }
 
 template <class T>
