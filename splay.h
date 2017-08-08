@@ -16,10 +16,12 @@ class SplayTree {
         using size_type = std::size_t;
         using reference = value_type&;
         using const_reference = const value_type&;
-        using iterator = Iterator<false>;
-        using const_iterator = Iterator<true>;
         using pointer = value_type*;
         using const_pointer = const value_type*;
+        using iterator = Iterator<false>;
+        using const_iterator = Iterator<true>;
+        using reverse_iterator = std::reverse_iterator<iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     private:
         class Node;
@@ -70,6 +72,13 @@ class SplayTree {
         const_iterator end() const;
         const_iterator cend() const;
 
+        reverse_iterator rbegin();
+        const_reverse_iterator rbegin() const;
+        const_reverse_iterator crbegin() const;
+        reverse_iterator rend();
+        const_reverse_iterator rend() const;
+        const_reverse_iterator crend() const;
+
     private:
         Node& root() const {
             return *(dummy_.son_[0]);
@@ -91,7 +100,7 @@ class SplayTree {
         void reverseTree() noexcept;
 
     private:
-        Node dummy_;
+        mutable Node dummy_;
 };
 
 template <class T>
@@ -167,10 +176,6 @@ class SplayTree<T>::Iterator :
                                            SplayTree::const_pointer,
                                            SplayTree::pointer>;
 
-    private:
-        using NodePtr = std::conditional_t<IsConst, const SplayTree::Node*,
-                                           SplayTree::Node*>;
-
     public:
         Iterator() : node_(nullptr) {}
         Iterator(const Iterator<false>& rhs) {
@@ -210,10 +215,10 @@ class SplayTree<T>::Iterator :
         }
 
     private:
-        Iterator(NodePtr node) : node_(node) {}
+        Iterator(SplayTree::Node* node) : node_(node) {}
 
     private:
-        NodePtr node_;
+        SplayTree::Node* node_;
 };
 
 
@@ -453,6 +458,36 @@ typename SplayTree<T>::const_iterator SplayTree<T>::end() const {
 template <class T>
 typename SplayTree<T>::const_iterator SplayTree<T>::cend() const {
     return end();
+}
+
+template <class T>
+typename SplayTree<T>::reverse_iterator SplayTree<T>::rbegin() {
+    return reverse_iterator(end());
+}
+
+template <class T>
+typename SplayTree<T>::const_reverse_iterator SplayTree<T>::rbegin() const {
+    return const_reverse_iterator(end());
+}
+
+template <class T>
+typename SplayTree<T>::const_reverse_iterator SplayTree<T>::crbegin() const {
+    return const_reverse_iterator(end());
+}
+
+template <class T>
+typename SplayTree<T>::reverse_iterator SplayTree<T>::rend() {
+    return reverse_iterator(begin());
+}
+
+template <class T>
+typename SplayTree<T>::const_reverse_iterator SplayTree<T>::rend() const {
+    return const_reverse_iterator(begin());
+}
+
+template <class T>
+typename SplayTree<T>::const_reverse_iterator SplayTree<T>::crend() const {
+    return const_reverse_iterator(begin());
 }
 
 
