@@ -48,8 +48,11 @@ class SplayTree {
             return dummy_.leftSubtreeSize();
         }
 
-        reference find(size_type index);
-        const_reference find(size_type index) const;
+        // Return reference to element at given position.
+        // Average complexity is O(log size()).
+        // Recently accessed elements are accessed faster.
+        reference at(size_type index);
+        const_reference at(size_type index) const;
 
         // Remove elements in [left_size, size()) and return new tree with those
         // elements.
@@ -60,11 +63,13 @@ class SplayTree {
         // Complexity: O(log size())
         void merge(SplayTree&& rhs);
 
-        // reverse elements in range [first, last)
+        // Reverse elements in range [first, last)
+        // Complexity: O(log size())
         void reverse(size_type first, size_type last);
 
         void swap(SplayTree& rhs) noexcept;
 
+        // Iterating doesn't change tree structure.
         iterator begin();
         const_iterator begin() const;
         const_iterator cbegin() const;
@@ -93,6 +98,7 @@ class SplayTree {
 
         void rotate(Node&);
 
+        // Move node up making it root while rebalancing nodes on its path.
         void splay(Node&);
 
         Node& findNode(size_type index) const;
@@ -111,8 +117,6 @@ class SplayTree<T>::Node {
         }
         Node(const Node&) = delete;
         Node(Node&&) = default;
-
-        // explicit Node(Node& dad) : dad_(&dad) {}
 
         bool whichSon() const noexcept {
             return dad_->son_[1].get() == this;
@@ -182,6 +186,8 @@ class SplayTree<T>::Iterator :
             node_ = rhs.node_;
         }
 
+        // Average complexity for increment / decrement operators is O(1)
+        // Worst case complexity is O(height)
         Iterator& operator++();
 
         Iterator operator++(int) {
@@ -343,7 +349,7 @@ typename SplayTree<T>::Node& SplayTree<T>::findNode(size_type i) const {
 }
 
 template <class T>
-typename SplayTree<T>::reference SplayTree<T>::find(size_type i) {
+typename SplayTree<T>::reference SplayTree<T>::at(size_type i) {
     if (i >= size()) {
         throw std::out_of_range(std::string("Index ") + std::to_string(i) +
                                 " is greater than size() which is " +
@@ -354,7 +360,7 @@ typename SplayTree<T>::reference SplayTree<T>::find(size_type i) {
 }
 
 template <class T>
-typename SplayTree<T>::const_reference SplayTree<T>::find(size_type i) const {
+typename SplayTree<T>::const_reference SplayTree<T>::at(size_type i) const {
     if (i >= size()) {
         throw std::out_of_range(std::string("Index ") + std::to_string(i) +
                                 " is greater than size() which is " +
@@ -539,6 +545,4 @@ SplayTree<T>::Iterator<IsConst>::operator--() {
     }
     return *this;
 }
-
-template class SplayTree<int>;
 
