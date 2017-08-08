@@ -178,7 +178,20 @@ class SplayTree<T>::Iterator :
         }
 
         Iterator& operator++();
+
+        Iterator operator++(int) {
+            auto result = *this;
+            operator++();
+            return result;
+        }
+
         Iterator& operator--();
+
+        Iterator operator--(int) {
+            auto result = *this;
+            operator--();
+            return result;
+        }
 
         friend bool operator==(const Iterator& lhs, const Iterator& rhs) {
             return lhs.node_ == rhs.node_;
