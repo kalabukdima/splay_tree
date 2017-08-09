@@ -228,6 +228,9 @@ class SplayTree<T>::Iterator :
             return &node_->data_;
         }
 
+        // Return index in containing SplayTree.
+        typename SplayTree::size_type order() const;
+
     private:
         Iterator(SplayTree::Node* node) : node_(node) {}
 
@@ -594,5 +597,21 @@ SplayTree<T>::Iterator<IsConst>::operator--() {
         node_ = node_->dad_;
     }
     return *this;
+}
+
+template <class T>
+template <bool IsConst>
+auto SplayTree<T>::Iterator<IsConst>::order() const -> size_type {
+    size_type result = node_->leftSubtreeSize();
+    Node* p = node_;
+    while (p->dad_ != p->dad_->dad_) {
+        if (p->whichSon()) {
+            p = p->dad_;
+            result += p->leftSubtreeSize() + 1;
+        } else {
+            p = p->dad_;
+        }
+    }
+    return result;
 }
 
