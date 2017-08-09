@@ -59,6 +59,9 @@ class SplayTree {
         // Complexity: O(log size())
         SplayTree split(size_type left_size);
 
+        // Split before given iterator.
+        SplayTree split(const_iterator);
+
         // Append elements from rhs to this tree.
         // Complexity: O(log size())
         void merge(SplayTree&& rhs);
@@ -373,12 +376,18 @@ typename SplayTree<T>::const_reference SplayTree<T>::at(size_type i) const {
 
 template <class T>
 SplayTree<T> SplayTree<T>::split(size_type left_size) {
-    if (left_size == 0) {
-        SplayTree<T> result;
-        result.dummy_.link(std::move(dummy_.son_[0]), 0);
-        return result;
+    return split(const_iterator(&findNode(left_size)));
+}
+
+template <class T>
+SplayTree<T> SplayTree<T>::split(const_iterator it) {
+    auto prev = it;
+    try {
+        --prev;
+    } catch (std::runtime_error) {
+        return std::move(*this);
     }
-    splay(findNode(left_size - 1));
+    splay(*prev.node_);
     SplayTree<T> result;
     result.dummy_.link(std::move(root().son_[1]), 0);
     root().updateSubtreeSize();
