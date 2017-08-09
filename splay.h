@@ -72,6 +72,9 @@ class SplayTree {
 
         iterator insert(const_iterator, T);
 
+        iterator erase(const_iterator pos);
+        iterator erase(const_iterator first, const_iterator last);
+
         void swap(SplayTree& rhs) noexcept;
 
         // Iterating doesn't change tree structure.
@@ -454,6 +457,25 @@ typename SplayTree<T>::iterator SplayTree<T>::insert(const_iterator it, T e) {
     }
     splay(*new_node);
     return {new_node};
+}
+
+template <class T>
+typename SplayTree<T>::iterator SplayTree<T>::erase(const_iterator pos) {
+    const auto copy = pos;
+    return erase(copy, ++pos);
+}
+
+template <class T>
+typename SplayTree<T>::iterator SplayTree<T>::erase(const_iterator first,
+                                                    const_iterator last) {
+    auto right = split(last);
+    split(first);
+    merge(std::move(right));
+    if (empty() || !root().son_[1]) {
+        return end();
+    } else {
+        return iterator(root().son_[1].get());
+    }
 }
 
 template <class T>
