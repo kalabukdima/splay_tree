@@ -254,11 +254,10 @@ SplayTree<T>::SplayTree(ForwardIterator begin, ForwardIterator end) {
     dummy_.link(buildTree(begin, end), 0);
 }
 
-
 template <class T>
 template <class ForwardIterator>
-std::unique_ptr<typename SplayTree<T>::Node> SplayTree<T>::buildTree(
-        ForwardIterator begin, ForwardIterator end) {
+auto SplayTree<T>::buildTree(ForwardIterator begin,
+                             ForwardIterator end) -> std::unique_ptr<Node> {
     const auto dist = std::distance(begin, end);
     if (dist == 0) {
         return nullptr;
@@ -338,7 +337,7 @@ void SplayTree<T>::splay(Node& u) {
 }
 
 template <class T>
-typename SplayTree<T>::Node& SplayTree<T>::findNode(size_type i) const {
+auto SplayTree<T>::findNode(size_type i) const -> Node& {
     size_type cumulated = 0;
     Node* p = &root();
     while (true) {
@@ -357,7 +356,7 @@ typename SplayTree<T>::Node& SplayTree<T>::findNode(size_type i) const {
 }
 
 template <class T>
-typename SplayTree<T>::reference SplayTree<T>::at(size_type i) {
+auto SplayTree<T>::at(size_type i) -> reference {
     if (i >= size()) {
         throw std::out_of_range(std::string("Index ") + std::to_string(i) +
                                 " is greater than size() which is " +
@@ -368,7 +367,7 @@ typename SplayTree<T>::reference SplayTree<T>::at(size_type i) {
 }
 
 template <class T>
-typename SplayTree<T>::const_reference SplayTree<T>::at(size_type i) const {
+auto SplayTree<T>::at(size_type i) const -> const_reference {
     if (i >= size()) {
         throw std::out_of_range(std::string("Index ") + std::to_string(i) +
                                 " is greater than size() which is " +
@@ -442,7 +441,7 @@ void SplayTree<T>::reverse(size_type first, size_type last) {
 }
 
 template <class T>
-typename SplayTree<T>::iterator SplayTree<T>::insert(const_iterator it, T e) {
+auto SplayTree<T>::insert(const_iterator it, T e) -> iterator {
     Node* new_node = nullptr;
     if (!it.node_->son_[0]) {
         it.node_->link(std::make_unique<Node>(std::move(e)), 0);
@@ -460,14 +459,14 @@ typename SplayTree<T>::iterator SplayTree<T>::insert(const_iterator it, T e) {
 }
 
 template <class T>
-typename SplayTree<T>::iterator SplayTree<T>::erase(const_iterator pos) {
+auto SplayTree<T>::erase(const_iterator pos) -> iterator {
     const auto copy = pos;
     return erase(copy, ++pos);
 }
 
 template <class T>
-typename SplayTree<T>::iterator SplayTree<T>::erase(const_iterator first,
-                                                    const_iterator last) {
+auto SplayTree<T>::erase(const_iterator first,
+                         const_iterator last) -> iterator {
     auto right = split(last);
     split(first);
     merge(std::move(right));
@@ -479,7 +478,7 @@ typename SplayTree<T>::iterator SplayTree<T>::erase(const_iterator first,
 }
 
 template <class T>
-typename SplayTree<T>::iterator SplayTree<T>::begin() {
+auto SplayTree<T>::begin() -> iterator {
     if (empty()) {
         return end();
     }
@@ -487,7 +486,7 @@ typename SplayTree<T>::iterator SplayTree<T>::begin() {
 }
 
 template <class T>
-typename SplayTree<T>::const_iterator SplayTree<T>::begin() const {
+auto SplayTree<T>::begin() const -> const_iterator {
     if (empty()) {
         return end();
     }
@@ -495,7 +494,7 @@ typename SplayTree<T>::const_iterator SplayTree<T>::begin() const {
 }
 
 template <class T>
-typename SplayTree<T>::const_iterator SplayTree<T>::cbegin() const {
+auto SplayTree<T>::cbegin() const -> const_iterator {
     if (empty()) {
         return cend();
     }
@@ -503,47 +502,47 @@ typename SplayTree<T>::const_iterator SplayTree<T>::cbegin() const {
 }
 
 template <class T>
-typename SplayTree<T>::iterator SplayTree<T>::end() {
+auto SplayTree<T>::end() -> iterator {
     return iterator(&dummy_);
 }
 
 template <class T>
-typename SplayTree<T>::const_iterator SplayTree<T>::end() const {
+auto SplayTree<T>::end() const -> const_iterator {
     return const_iterator(&dummy_);
 }
 
 template <class T>
-typename SplayTree<T>::const_iterator SplayTree<T>::cend() const {
+auto SplayTree<T>::cend() const -> const_iterator {
     return end();
 }
 
 template <class T>
-typename SplayTree<T>::reverse_iterator SplayTree<T>::rbegin() {
+auto SplayTree<T>::rbegin() -> reverse_iterator {
     return reverse_iterator(end());
 }
 
 template <class T>
-typename SplayTree<T>::const_reverse_iterator SplayTree<T>::rbegin() const {
+auto SplayTree<T>::rbegin() const -> const_reverse_iterator {
     return const_reverse_iterator(end());
 }
 
 template <class T>
-typename SplayTree<T>::const_reverse_iterator SplayTree<T>::crbegin() const {
+auto SplayTree<T>::crbegin() const -> const_reverse_iterator {
     return const_reverse_iterator(end());
 }
 
 template <class T>
-typename SplayTree<T>::reverse_iterator SplayTree<T>::rend() {
+auto SplayTree<T>::rend() -> reverse_iterator {
     return reverse_iterator(begin());
 }
 
 template <class T>
-typename SplayTree<T>::const_reverse_iterator SplayTree<T>::rend() const {
+auto SplayTree<T>::rend() const -> const_reverse_iterator {
     return const_reverse_iterator(begin());
 }
 
 template <class T>
-typename SplayTree<T>::const_reverse_iterator SplayTree<T>::crend() const {
+auto SplayTree<T>::crend() const -> const_reverse_iterator {
     return const_reverse_iterator(begin());
 }
 
