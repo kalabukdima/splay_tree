@@ -98,7 +98,7 @@ class SplayTree {
         }
 
         bool isRoot(const Node& node) const {
-            return node.dad_ == &dummy_;
+            return node.dad_ == node.dad_->dad_;
         }
 
         template <class ForwardIterator>
