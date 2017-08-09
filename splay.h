@@ -48,11 +48,27 @@ class SplayTree {
             return dummy_.leftSubtreeSize();
         }
 
+        void clear();
+
         // Return reference to element at given position.
         // Average complexity is O(log size()).
         // Recently accessed elements are accessed faster.
         reference at(size_type index);
         const_reference at(size_type index) const;
+
+        reference front() {
+            return at(0);
+        }
+        const_reference front() const {
+            return at(0);
+        }
+
+        reference back() {
+            return at(size() - 1);
+        }
+        const_reference back() const {
+            return at(size() - 1);
+        }
 
         // Remove elements in [left_size, size()) and return new tree with those
         // elements.
@@ -274,6 +290,12 @@ auto SplayTree<T>::buildTree(ForwardIterator begin,
     result->link(buildTree(begin, mid), 0);
     result->link(buildTree(++mid, end), 1);
     return result;
+}
+
+template <class T>
+void SplayTree<T>::clear() {
+    dummy_.son_[0] = nullptr;
+    dummy_.updateSubtreeSize();
 }
 
 template <class T>
