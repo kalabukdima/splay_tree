@@ -6,6 +6,17 @@
 #include <iterator>
 #include <type_traits>
 
+#define STR_DETAIL(x) #x
+#define STR(x) STR_DETAIL(x)
+#if defined(DEBUG)
+#define EXPECTS(cond) if (!(cond))\
+throw std::runtime_error("Precondition failure at " __FILE__ ":"\
+                         STR(__LINE__));
+#else
+#define EXPECTS(cond)
+#endif
+
+
 template <class T>
 class SplayTree {
     public:
@@ -335,9 +346,7 @@ void SplayTree<T>::rotate(Node& u) {
 
 template <class T>
 void SplayTree<T>::splay(Node& u) {
-    if (&u == &dummy_) {
-        throw std::runtime_error("called splay(dummy_)"); //TODO
-    }
+    EXPECTS(&u != &dummy_)
     while (!isRoot(u)) {
         Node& v = *u.dad_;
         if (isRoot(v)) {
